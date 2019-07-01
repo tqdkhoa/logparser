@@ -19,8 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.w3c.dom.ls.LSResourceResolver;
 
-import com.mysql.cj.log.Log;
+import ch.qos.logback.core.rolling.helper.TimeBasedArchiveRemover.ArhiveRemoverRunnable;
 
 @SpringBootApplication
 public class ParserApplication implements CommandLineRunner {
@@ -37,37 +38,48 @@ public class ParserApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) {
 		log.info("StartApplication...");
+		
+		if(args.length != 3) {
+			System.out.println("Missing input arguments: --startDate= --duration --threshold");
+		}
+		
+		String startDate = args[0];
+		String duration = args[1];
+		Integer threshold = Integer.valueOf(args[2]);
 
-		StringBuilder content = new StringBuilder();
-		content.append("id,date,http_status,ipaddress,request,user_agent");
-		content.append("\n");
+		// Parse Input Arguments
+		String pattern = "yyyy-MM-dd HH:mm:ss";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+		Date date = null;
+		try {
+			date = simpleDateFormat.parse("2017-01-01 00:00:12");
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		long startTime = date.getTime();
+		long endTime = startTime + (3600 * 1000);
+
+		List<LogInfo> lstLogInfo = new ArrayList<LogInfo>();
 		// Read log file
 		try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/access.log"))) {
 
-			String line;
-			Integer id = 1;
-			//List<LogInfo> lst = new ArrayList<>();
-			
+			String line = null;
 			while ((line = reader.readLine()) != null) {
-				// System.out.println(content.toString());
-				String[] arr = line.split("\\|");
 
+				String[] arr = line.split("\\|");
 				String dateStr = arr[0];
-				String pattern = "yyyy-MM-dd HH:mm:ss";
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-				Date date = simpleDateFormat.parse(dateStr);
 				String ipAddress = arr[1];
 				String request = arr[2];
 				String httpStatus = arr[3];
 				String userAgent = arr[4];
 				
-				content.append(String.format("%d,%s,%s,%s,%s,%s", id++,dateStr,httpStatus,ipAddress,request,userAgent));
-				content.append("\n");
-				// repository.save(new LogInfo(date, ipAddress, request, httpStatus,// userAgent));
-				// lst.add(new LogInfo(date, ipAddress, request, httpStatus, userAgent));
-				
+				Date logDate = simpleDateFormat.parse(dateStr);
+				long logTime = logDate.getTime();
+				if(logTime >= startTime && logTime <= endTime) {
+					lstLogInfo.add(new LogInfo(logDate, ipAddress, request, httpStatus, userAgent));
+				}
 			}
-			//repository.saveAll(lst);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -78,16 +90,8 @@ public class ParserApplication implements CommandLineRunner {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		try(BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/resources/access.csv"))){
-			bw.write(content.toString());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// Store in MySQL
-
-		// ToDo
+		System.out.println("Number of requests have been taken in given time:" + lstLogInfo.size());
+		System.out.println("Inserting into MySQL ...");
+		repository.saveAll(lstLogInfo);
 	}
 }

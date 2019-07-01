@@ -9,85 +9,91 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 @Entity
-@Table(name="loginfo")
+@Table(name = "log_info")
 public class LogInfo {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-	@Column
-    private Long id;
-	@Column
-	private Date date;
-	@Column(length = 50, nullable = true)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Column(name = "log_date", nullable = false)
+	private Date logDate;
+
+	@Column(name = "ip_address", length = 255, nullable = true)
 	private String iPAddress;
-	@Column(length = 255, nullable = true)
-	private String request;
-	@Column(length = 255, nullable = true)
+
+	@Column(name = "http_request", length = 255, nullable = true)
+	private String httpRequest;
+
+	@Column(name = "http_status", length = 255, nullable = true)
 	private String httpStatus;
-	@Column(length = 255, nullable = true)
+
+	@Column(name = "user_agent", length = 255, nullable = true)
 	private String userAgent;
-	
+
 	public Long getId() {
-        return id;
-    }
+		return id;
+	}
 
 	public Date getDate() {
-		return date;
+		return logDate;
 	}
-	public void setDate(Date date) {
-		this.date = date;
+
+	public void setDate(Date logDate) {
+		this.logDate = logDate;
 	}
+
 	public String getIPAddress() {
 		return iPAddress;
 	}
+
 	public void setIPAddress(String iPAddress) {
 		this.iPAddress = iPAddress;
 	}
-	public String getRequest() {
-		return request;
+
+	public String getHttpRequest() {
+		return httpRequest;
 	}
-	public void setRequest(String request) {
-		this.request = request;
+
+	public void setHttpRequest(String httpRequest) {
+		this.httpRequest = httpRequest;
 	}
+
 	public String getHttpStatus() {
 		return httpStatus;
 	}
+
 	public void setHttpStatus(String httpStatus) {
 		this.httpStatus = httpStatus;
 	}
+
 	public String getUserAgent() {
 		return userAgent;
 	}
+
 	public void setUserAgent(String userAgent) {
 		this.userAgent = userAgent;
 	}
-	
+
 	public LogInfo() {
-		
-    }
-	
-	public LogInfo(Date date, String iPAddress, String request, String httpStatus, String userAgent) {
+
+	}
+
+	public LogInfo(Date logDate, String iPAddress, String httpRequest, String httpStatus, String userAgent) {
 		super();
-		this.date = date;
+		this.logDate = logDate;
 		this.iPAddress = iPAddress;
-		this.request = request;
+		this.httpRequest = httpRequest;
 		this.httpStatus = httpStatus;
 		this.userAgent = userAgent;
 	}
 
 	@Override
 	public String toString() {
-		return "LogInfo{" +
-                "id=" + id +
-                ", date='" + date.toString() + '\'' +
-                ", ipAddress='" + iPAddress + '\'' +
-                ", request='" + request + '\'' +
-                ", httpStatus='" + httpStatus + '\'' +
-                ", userAgent='" + userAgent + '\'' +
-                '}';
+		return "LogInfo{" + "id=" + id + ", date='" + logDate.toString() + '\'' + ", ipAddress='" + iPAddress + '\''
+				+ ", request='" + httpRequest + '\'' + ", httpStatus='" + httpStatus + '\'' + ", userAgent='"
+				+ userAgent + '\'' + '}';
 	}
-	
-	
+
 }

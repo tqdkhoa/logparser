@@ -39,13 +39,13 @@ public class ParserApplication implements CommandLineRunner {
 	public void run(String... args) {
 		log.info("StartApplication...");
 		
-		if(args.length != 3) {
-			System.out.println("Missing input arguments: --startDate= --duration --threshold");
-		}
-		
-		String startDate = args[0];
-		String duration = args[1];
-		Integer threshold = Integer.valueOf(args[2]);
+//		if(args.length != 3) {
+//			System.out.println("Missing input arguments: --startDate= --duration --threshold");
+//		}
+//		
+//		String startDate = args[0];
+//		String duration = args[1];
+//		Integer threshold = Integer.valueOf(args[2]);
 
 		// Parse Input Arguments
 		String pattern = "yyyy-MM-dd HH:mm:ss";

@@ -1,4 +1,4 @@
-package com.ef.Parser;
+package com.ef.Parser.model;
 
 import java.util.Date;
 

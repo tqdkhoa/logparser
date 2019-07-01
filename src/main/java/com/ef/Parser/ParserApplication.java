@@ -1,10 +1,8 @@
 package com.ef.Parser;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,14 +12,14 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.w3c.dom.ls.LSResourceResolver;
 
-import ch.qos.logback.core.rolling.helper.TimeBasedArchiveRemover.ArhiveRemoverRunnable;
+import com.ef.Parser.model.LogInfo;
+import com.ef.Parser.repository.LogInfoRepository;
+import com.ef.Parser.service.LogInfoService;
 
 @SpringBootApplication
 public class ParserApplication implements CommandLineRunner {
@@ -29,7 +27,7 @@ public class ParserApplication implements CommandLineRunner {
 	private static final Logger log = LoggerFactory.getLogger(ParserApplication.class);
 
 	@Autowired
-	private LogInfoRepository repository;
+	private LogInfoService service;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ParserApplication.class, args);
@@ -92,6 +90,6 @@ public class ParserApplication implements CommandLineRunner {
 		}
 		System.out.println("Number of requests have been taken in given time:" + lstLogInfo.size());
 		System.out.println("Inserting into MySQL ...");
-		repository.saveAll(lstLogInfo);
+		service.saveAllLogInfo(lstLogInfo);
 	}
 }

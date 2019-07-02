@@ -42,11 +42,12 @@ public class ParserApplication implements CommandLineRunner {
 	public void run(String... args)  throws Exception {
 		log.info("StartApplication...");
 
-		if (args.length != 3) {
-			System.out.println("Missing input arguments: --startDate=<yyyy-MM-dd.HH:mm:ss> --duration=<hourly|daily> --threshold=<number>");
+		if (args.length != 4) {
+			System.out.println("Missing input arguments: --accesslog=/path/to/file --startDate=<yyyy-MM-dd.HH:mm:ss> --duration=<hourly|daily> --threshold=<number>");
 			return;
 		}
 		
+		String accessLogPath = env.getProperty("accesslog");
 		String strStartDate = env.getProperty("startDate");
 		String strDuration = env.getProperty("duration");
 		String thresholdInput= env.getProperty("threshold");
@@ -74,7 +75,7 @@ public class ParserApplication implements CommandLineRunner {
 		
 		//Read file and filter which lines satisfy the startDate and duration
 		List<LogInfo> lstLogInfo = new ArrayList<LogInfo>();
-		try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/access.log"))) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(accessLogPath))) {
 
 			String line = null;
 			while ((line = reader.readLine()) != null) {

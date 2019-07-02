@@ -16,5 +16,13 @@ There are 3 files, including:
 <b>java -jar parser.jar --accesslog=/path/to/file --startDate=2017-01-01.13:00:00 --duration=hourly|daily --threshold=100</b>
 
 ### Output
+#### Console
 192.168.228.188 has 100 or more requests between 2017-01-01.13:00:00 and 2017-01-01.14:00:00<br>
 192.168.77.101 has 100 or more requests between 2017-01-01.13:00:00 and 2017-01-01.14:00:00<br>
+<br>
+#### Database Table: hour_history table (if duration is "hourly"), daily_history (if duration is "daily")
+|id |  message                                                                                      | <br>
+|1  |  192.168.228.188 has 100 or more requests between 2017-01-01.13:00:00 and 2017-01-01.14:00:00 | <br><br>
+|2  |  192.168.77.101 has 100 or more requests between 2017-01-01.13:00:00 and 2017-01-01.14:00:00  | <br>
+
+

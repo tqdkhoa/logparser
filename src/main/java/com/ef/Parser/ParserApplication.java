@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,8 +18,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.ef.Parser.model.HourlyHistory;
 import com.ef.Parser.model.LogInfo;
-import com.ef.Parser.repository.LogInfoRepository;
 import com.ef.Parser.service.LogInfoService;
 
 @SpringBootApplication
@@ -46,17 +47,18 @@ public class ParserApplication implements CommandLineRunner {
 //		Integer threshold = Integer.valueOf(args[2]);
 
 		// Parse Input Arguments
-		String pattern = "yyyy-MM-dd HH:mm:ss";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-		Date date = null;
+		String inputPattern = "yyyy-MM-dd.HH:mm:ss";
+		SimpleDateFormat inputSdf = new SimpleDateFormat(inputPattern);
+		Date startDate = null;
 		try {
-			date = simpleDateFormat.parse("2017-01-01 00:00:12");
-		} catch (ParseException e1) {
+			startDate = inputSdf.parse("2017-01-01.00:00:12");
+		} catch (ParseException ex) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			ex.printStackTrace();
 		}
-		long startTime = date.getTime();
+		long startTime = startDate.getTime();
 		long endTime = startTime + (3600 * 1000);
+		Date endDate = new Date(endTime);
 
 		List<LogInfo> lstLogInfo = new ArrayList<LogInfo>();
 		// Read log file
@@ -72,7 +74,9 @@ public class ParserApplication implements CommandLineRunner {
 				String httpStatus = arr[3];
 				String userAgent = arr[4];
 				
-				Date logDate = simpleDateFormat.parse(dateStr);
+				String logPattern = "yyyy-MM-dd HH:mm:ss";
+				SimpleDateFormat logSpf = new SimpleDateFormat(logPattern);
+				Date logDate = logSpf.parse(dateStr);
 				long logTime = logDate.getTime();
 				if(logTime >= startTime && logTime <= endTime) {
 					lstLogInfo.add(new LogInfo(logDate, ipAddress, request, httpStatus, userAgent));
@@ -91,5 +95,15 @@ public class ParserApplication implements CommandLineRunner {
 		System.out.println("Number of requests have been taken in given time:" + lstLogInfo.size());
 		System.out.println("Inserting into MySQL ...");
 		service.saveAllLogInfo(lstLogInfo);
+		
+		Long threshold = (long) 100;  
+		String strStartDate = inputSdf.format(startDate);  
+		String strEndDate = inputSdf.format(endDate);
+		List<LogInfo> lst = service.findIPAdressReachingThreshold(startDate, endDate, threshold);
+		for(LogInfo inf : lst) {
+			String msg = String.format("%s has %d or more requests between %s and %s",inf.getIPAddress(), threshold, strStartDate, strEndDate);
+			service.saveHourlyHistory(new HourlyHistory(msg));
+			System.out.println(msg);
+		}
 	}
 }
